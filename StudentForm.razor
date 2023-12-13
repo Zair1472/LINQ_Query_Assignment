@@ -1,0 +1,149 @@
+﻿@page "/StudentForm"
+@using ClassTask.Model;
+
+<h3>Student Form</h3>
+
+<EditForm Model="@student" OnValidSubmit="@HandleOnSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+
+    <label>
+        Student Id :
+        <InputNumber @bind-Value="student.sid" />
+    </label>
+    <br>
+     <label>
+        Student Name :
+        <InputText @bind-Value="student.sname" />
+    </label>
+    <br>
+    <label>
+        Student Major :
+        <InputText @bind-Value="student.major" />
+    </label>
+    <br>
+    <label>
+        Student Standing :
+        <InputText @bind-Value="student.standing" />
+    </label>
+   
+    <button type="submit" >Submit</button>
+
+</EditForm>
+
+
+
+
+
+
+@code {
+    Student student = new Student();
+    
+
+    void HandleOnSubmit() 
+    {
+        student.sid++;
+    }
+//Query No 2:
+    List<Student> students1 = new List<Student>
+    {
+        new Student { sid = 1, major = "Computer Science" },
+        new Student { sid = 2, major = "Mathematics" },
+        new Student { sid = 3, major = "Physics" },
+       
+    };
+
+    List<Class> classes1 = new List<Class>
+    {
+        new Class { cid = 101, TeacherDepartment = 22 },
+        new Class { cid = 102, TeacherDepartment = 20 },
+        new Class { cid = 103, TeacherDepartment = 25 },
+      
+    };
+
+    
+    var studentsWithoutTeachersInDept22 = students1
+        .Where(s => !classes1.Any(c => c.TeacherDepartment == 22))
+        .Select(s => new { s.Id, s.Major });
+
+//Query No 3:
+
+List<Student> students2 = new List<Student>
+    {
+        new Student { sid = 1, major = "Computer Science", Age = 21 },
+        new Student { sid = 2, major = "Mathematics", Age = 22 },
+        new Student { sid = 3, major = "Physics", Age = 20 },
+        new Student { sid = 4, major = "Computer Science", Age = 23 },
+        new Student { sid = 5, major = "Mathematics", Age = 25 },
+
+    };
+
+    
+    var averageAgeByMajor = students2.GroupBy(student => student.major).Select(group => new
+        {
+            Major = group.Key,
+            AverageAge = group.Average(student => student.Age)
+        });
+
+//Query No 4:
+
+ List<Student> students3 = new List<Student>
+    {
+        new Student { sid = 1, sname = "John Doe" },
+        new Student { sid = 2, sname = "Jane Smith" },
+       
+    };
+
+    
+    List<Enrollment> enrollmentes = new List<Enrollment>
+    {
+        new Enrollment { Studentsid = 1, Classcid = 101 },
+        new Enrollment { Studentsid = 1, Classcid = 102 },
+        new Enrollment { Studentsid = 1, Classcid = 103 },
+        new Enrollment { Studentsid = 2, Classcid = 101 },
+        new Enrollment { Studentsid = 2, Classcid = 102 },
+        
+    };
+
+    var studentsEnrolledInMultipleClasses = students3
+        .Select(student => new
+        {
+            student.sname,
+            EnrolledClassesCount = enrollmentes.Count(enrollment => enrollment.Studentsid == student.sid)
+        })
+        .Where(student => student.EnrolledClassesCount > 2);
+
+//Query No 5:
+    List<Student> students4 = new List<Student>
+    {
+        new Student { sid = 1, sname = "John Doe", Classcid = 101 },
+        new Student { sid = 2, sname = "Jane Smith", Classcid = 102 },
+       
+    };
+
+    
+    List<Class> classes4 = new List<Class>
+    {
+        new Class { cid = 101, Facultyfid = 1 },
+        new Class { cid = 102, Facultyfid = 2 },
+       
+    };
+
+   
+    List<Faculty> facultyMembers = new List<Faculty>
+    {
+        new Faculty { fid = 1, Department = "Computer Science" },
+        new Faculty { fid = 2, Department = "Physics" },
+     
+    };
+
+   
+    var studentsInComputerScience = students4
+        .Join(classes, student => student.Classcid, cls => cls.ClassId, (student, cls) => new { student, cls })
+        .Join(facultyMembers, entry => entry.cls.FacultyId, faculty => faculty.fid, (entry, faculty) => entry.student)
+        .Where(student => faculty.Department == "Computer Science")
+        .Select(student => student.Name);
+}
+
+

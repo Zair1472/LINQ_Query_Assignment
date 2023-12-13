@@ -1,0 +1,57 @@
+﻿@page "/ClassForm"
+@using ClassTask.Model;
+
+<h3>ClassForm</h3>
+
+<EditForm Model="@classs" OnValidSubmit="@HandleOnSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    
+    <label>
+        Enter Class Id :
+        <InputNumber @bind-Value="classs.cid" />
+    </label>
+    <br>
+    <label>
+        Enter Class Id :
+        <InputText @bind-Value="classs.cname" />
+    </label>
+    <br>
+    <label>
+        Enter Class Id :
+        <InputNumber @bind-Value="classs.room_number" />
+    </label>
+
+</EditForm>
+
+
+
+@code {
+    Class classs = new Class();
+
+    void HandleOnSubmit()
+    {
+        
+        classs.cid++;
+    }
+
+ // Query No 1:
+    List<Class> classes = new List<Class>
+    {
+        new Class { cname = "Math",room_number = 101, NumberOfStudents = 120 },
+        new Class { cname = "History", room_number = 102, NumberOfStudents = 90 },
+        new Class { cname = "Physics", room_number = 103, NumberOfStudents = 110 },
+      
+    };
+    var selectedClasses = classes.Where(c => c.NumberOfStudents > 100)
+                                 .Select(c => new { c.cname, c.room_number });
+}
+<h3>Classes with more than 100 students:</h3>
+<ul>
+    @foreach (var selectedClass in selectedClasses)
+    {
+        <li>@($"{selectedClass.Name} - Room {selectedClass.RoomNumber}")</li>
+    }
+</ul>
+
+}
